@@ -16,6 +16,8 @@
 
 package com.android.systemui.monet;
 
+import android.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 
 public class TonalPalette {
     private final com.google.ux.material.libmonet.palettes.TonalPalette mMaterialTonalPalette;
+    @Nullable
+    private final int[] mToneMapping;
     /**
      * @deprecated Do not use. For color system only
      */
@@ -31,7 +35,13 @@ public class TonalPalette {
     public final Map<Integer, Integer> allShadesMapped;
 
     TonalPalette(com.google.ux.material.libmonet.palettes.TonalPalette materialTonalPalette) {
+        this(materialTonalPalette, null);
+    }
+
+    TonalPalette(com.google.ux.material.libmonet.palettes.TonalPalette materialTonalPalette,
+            @Nullable int[] toneMapping) {
         this.mMaterialTonalPalette = materialTonalPalette;
+        this.mToneMapping = toneMapping;
         this.allShades = SHADE_KEYS.stream().map(key -> getAtTone(key.floatValue())).collect(
                 Collectors.toList());
         this.allShadesMapped = SHADE_KEYS.stream().collect(
@@ -44,7 +54,20 @@ public class TonalPalette {
      * @return Int representing color at new shade / tone
      */
     public int getAtTone(float shade) {
+        if (mToneMapping != null) {
+            int index = SHADE_KEYS.indexOf((int) shade);
+            if (index >= 0 && index < mToneMapping.length) {
+                return mMaterialTonalPalette.tone(mToneMapping[index]);
+            }
+        }
         return mMaterialTonalPalette.tone((int) ((1000.0f - shade) / 10f));
+    }
+
+    /**
+     * Returns the underlying material tonal palette for direct tone access.
+     */
+    public com.google.ux.material.libmonet.palettes.TonalPalette getMaterialTonalPalette() {
+        return mMaterialTonalPalette;
     }
 
     // Predefined & precomputed tones

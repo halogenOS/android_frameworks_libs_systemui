@@ -78,9 +78,22 @@ public class ColorScheme {
         this(List.of(seed), isDark, style, contrastLevel, specVersion, platform);
     }
 
+    public ColorScheme(@ColorInt int seed, boolean isDark, @ThemeStyle.Type int style,
+            double contrastLevel, int[] toneMapping) {
+        this(List.of(seed), isDark, style, contrastLevel, SpecVersion.SPEC_2026,
+                DynamicScheme.DEFAULT_PLATFORM, toneMapping);
+    }
+
     public ColorScheme(@NonNull @Size(min = 1) List<Integer> seeds, boolean isDark,
             @ThemeStyle.Type int style,
             double contrastLevel, SpecVersion specVersion, Platform platform) {
+        this(seeds, isDark, style, contrastLevel, specVersion, platform, null);
+    }
+
+    public ColorScheme(@NonNull @Size(min = 1) List<Integer> seeds, boolean isDark,
+            @ThemeStyle.Type int style,
+            double contrastLevel, SpecVersion specVersion, Platform platform,
+            int[] toneMapping) {
 
         this.mSeeds = seeds;
         this.mIsDark = isDark;
@@ -130,12 +143,12 @@ public class ColorScheme {
             default -> throw new IllegalArgumentException("Unknown style: " + style);
         };
 
-        mAccent1 = new TonalPalette(mMaterialScheme.primaryPalette);
-        mAccent2 = new TonalPalette(mMaterialScheme.secondaryPalette);
-        mAccent3 = new TonalPalette(mMaterialScheme.tertiaryPalette);
-        mNeutral1 = new TonalPalette(mMaterialScheme.neutralPalette);
-        mNeutral2 = new TonalPalette(mMaterialScheme.neutralVariantPalette);
-        mError = new TonalPalette(mMaterialScheme.errorPalette);
+        mAccent1 = new TonalPalette(mMaterialScheme.primaryPalette, toneMapping);
+        mAccent2 = new TonalPalette(mMaterialScheme.secondaryPalette, toneMapping);
+        mAccent3 = new TonalPalette(mMaterialScheme.tertiaryPalette, toneMapping);
+        mNeutral1 = new TonalPalette(mMaterialScheme.neutralPalette, toneMapping);
+        mNeutral2 = new TonalPalette(mMaterialScheme.neutralVariantPalette, toneMapping);
+        mError = new TonalPalette(mMaterialScheme.errorPalette, toneMapping);
     }
 
     public ColorScheme(@ColorInt int seed, boolean isDark, @ThemeStyle.Type int style,
