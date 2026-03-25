@@ -68,6 +68,11 @@ public class ColorScheme {
 
     public ColorScheme(@ColorInt int seed, boolean isDark, @ThemeStyle.Type int style,
             double contrastLevel) {
+        this(seed, isDark, style, contrastLevel, null);
+    }
+
+    public ColorScheme(@ColorInt int seed, boolean isDark, @ThemeStyle.Type int style,
+            double contrastLevel, int[] toneMapping) {
 
         this.mSeed = seed;
         this.mIsDark = isDark;
@@ -97,12 +102,12 @@ public class ColorScheme {
             default -> throw new IllegalArgumentException("Unknown style: " + style);
         };
 
-        mAccent1 = new TonalPalette(mMaterialScheme.primaryPalette);
-        mAccent2 = new TonalPalette(mMaterialScheme.secondaryPalette);
-        mAccent3 = new TonalPalette(mMaterialScheme.tertiaryPalette);
-        mNeutral1 = new TonalPalette(mMaterialScheme.neutralPalette);
-        mNeutral2 = new TonalPalette(mMaterialScheme.neutralVariantPalette);
-        mError = new TonalPalette(mMaterialScheme.errorPalette);
+        mAccent1 = new TonalPalette(mMaterialScheme.primaryPalette, toneMapping);
+        mAccent2 = new TonalPalette(mMaterialScheme.secondaryPalette, toneMapping);
+        mAccent3 = new TonalPalette(mMaterialScheme.tertiaryPalette, toneMapping);
+        mNeutral1 = new TonalPalette(mMaterialScheme.neutralPalette, toneMapping);
+        mNeutral2 = new TonalPalette(mMaterialScheme.neutralVariantPalette, toneMapping);
+        mError = new TonalPalette(mMaterialScheme.errorPalette, toneMapping);
     }
 
     public ColorScheme(@ColorInt int seed, boolean darkTheme) {

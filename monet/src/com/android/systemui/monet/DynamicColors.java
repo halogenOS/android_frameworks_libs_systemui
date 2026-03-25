@@ -38,25 +38,31 @@ public class DynamicColors {
      * Gets all DynamicColor tokens for the neutral palettes.
      */
     public static List<Pair<String, DynamicColor>> getAllNeutralPalette() {
+        return getAllNeutralPalette(null);
+    }
+
+    public static List<Pair<String, DynamicColor>> getAllNeutralPalette(int[] toneMapping) {
         List<Pair<String, Function<DynamicScheme, TonalPalette>>> neutralPaletteMap = Arrays.asList(
                 new Pair<>("neutral1", (s) -> s.neutralPalette),
                 new Pair<>("neutral2", (s) -> s.neutralVariantPalette)
         );
-        // Call the helper method with the specific neutral palettes
-        return generatePaletteColors(neutralPaletteMap);
+        return generatePaletteColors(neutralPaletteMap, toneMapping);
     }
 
     /**
      * Gets all DynamicColor tokens for the accent palettes.
      */
     public static List<Pair<String, DynamicColor>> getAllAccentPalette() {
+        return getAllAccentPalette(null);
+    }
+
+    public static List<Pair<String, DynamicColor>> getAllAccentPalette(int[] toneMapping) {
         List<Pair<String, Function<DynamicScheme, TonalPalette>>> accentPaletteMap = Arrays.asList(
                 new Pair<>("accent1", (s) -> s.primaryPalette),
                 new Pair<>("accent2", (s) -> s.secondaryPalette),
                 new Pair<>("accent3", (s) -> s.tertiaryPalette)
         );
-        // Call the helper method with the specific accent palettes
-        return generatePaletteColors(accentPaletteMap);
+        return generatePaletteColors(accentPaletteMap, toneMapping);
     }
 
     /**
@@ -67,7 +73,7 @@ public class DynamicColors {
                 new Pair<>("error", (s) -> s.errorPalette)
         );
 
-        return generatePaletteColors(errorPaletteMap);
+        return generatePaletteColors(errorPaletteMap, null);
     }
 
     /**
@@ -126,7 +132,8 @@ public class DynamicColors {
     }
 
     private static List<Pair<String, DynamicColor>> generatePaletteColors(
-            List<Pair<String, Function<DynamicScheme, TonalPalette>>> paletteMap) {
+            List<Pair<String, Function<DynamicScheme, TonalPalette>>> paletteMap,
+            int[] toneMapping) {
 
         return paletteMap.stream()
                 .flatMap(palettePair -> {
@@ -134,13 +141,24 @@ public class DynamicColors {
                     Function<DynamicScheme, TonalPalette> paletteExtractor = palettePair.second;
 
                     // Stream over the shades for the current palette
-                    return SHADE_KEYS.stream().map(shade -> {
+                    List<Integer> shadeKeys = SHADE_KEYS;
+                    return shadeKeys.stream().map(shade -> {
                         String tokenName = paletteName + "_" + shade;
+                        int shadeIndex = shadeKeys.indexOf(shade);
+
+                        double tone;
+                        if (toneMapping != null && shadeIndex >= 0
+                                && shadeIndex < toneMapping.length) {
+                            tone = toneMapping[shadeIndex];
+                        } else {
+                            tone = (1000.0f - shade) / 10f;
+                        }
+                        final double finalTone = tone;
 
                         DynamicColor token = new DynamicColor(
                                 /* name= */ tokenName,
                                 /* palette= */ paletteExtractor,
-                                /* tone= */ (s) -> (double) ((1000.0f - shade) / 10f),
+                                /* tone= */ (s) -> finalTone,
                                 /* isBackground= */ true,
                                 /* background= */ null,
                                 /* secondBackground= */ null,
